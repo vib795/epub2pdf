@@ -1,0 +1,69 @@
+# GoReleaser configuration
+version: 2
+
+project_name: epub2pdf
+
+before:
+  hooks:
+    - go mod tidy
+
+builds:
+  - id: epub2pdf
+    main: ./main.go
+    binary: epub2pdf
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - amd64
+      - arm64
+    ldflags:
+      - -s -w
+      - -X github.com/vib795/epub2pdf/cmd.Version={{.Version}}
+      - -X github.com/vib795/epub2pdf/cmd.BuildDate={{.Date}}
+      - -X github.com/vib795/epub2pdf/cmd.GitCommit={{.ShortCommit}}
+
+archives:
+  - id: default
+    format: tar.gz
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
+    format_overrides:
+      - goos: windows
+        format: zip
+    files:
+      - README.md
+      - LICENSE
+
+checksum:
+  name_template: 'checksums.txt'
+
+brews:
+  - name: epub2pdf
+    repository:
+      owner: vib795
+      name: homebrew-tap
+      token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
+    folder: Formula
+    homepage: "https://github.com/vib795/epub2pdf"
+    description: "Fast CLI tool to convert EPUB files to PDF"
+    license: "MIT"
+    install: |
+      bin.install "epub2pdf"
+    test: |
+      system "#{bin}/epub2pdf", "version"
+    caveats: |
+      epub2pdf requires Chrome or Chromium for PDF rendering.
+      
+      If you don't have Chrome installed, you can install Chromium:
+        brew install --cask chromium
+
+release:
+  github:
+    owner: vib795
+    name: epub2pdf
+  draft: false
+  prerelease: auto
+  name_template: "v{{.Version}}"
