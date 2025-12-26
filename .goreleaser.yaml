@@ -46,7 +46,7 @@ brews:
       owner: vib795
       name: homebrew-tap
       token: "{{ .Env.HOMEBREW_TAP_TOKEN }}"
-    folder: Formula
+      directory: Formula
     homepage: "https://github.com/vib795/epub2pdf"
     description: "Fast CLI tool to convert EPUB files to PDF"
     license: "MIT"
